@@ -1,0 +1,32 @@
+[
+    {
+        "destino": "Rio de Janeiro",
+        "preco": "1200",
+        "imagem": "https://picsum.photos/300/200",
+        "descricao": "Pacote teste Rio",
+        "link": "https://www.example.com",
+        "dataInicio": "2025-10-01",
+        "dataFim": "2025-10-05",
+        "dias": 5
+    },
+    {
+        "destino": "Salvador",
+        "preco": "1500",
+        "imagem": "https://picsum.photos/300/200",
+        "descricao": "Pacote teste Salvador",
+        "link": "https://www.example.com",
+        "dataInicio": "2025-10-03",
+        "dataFim": "2025-10-08",
+        "dias": 5
+    },
+    {
+        "destino": "Fortaleza",
+        "preco": "1300",
+        "imagem": "https://picsum.photos/300/200",
+        "descricao": "Pacote teste Fortaleza",
+        "link": "https://www.example.com",
+        "dataInicio": "2025-10-05",
+        "dataFim": "2025-10-10",
+        "dias": 5
+    }
+]

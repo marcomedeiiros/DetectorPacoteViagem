@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melhores Promoções de Pacotes de Viagem - Atualização em Tempo Real</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="shortcut icon" href="./8133073.ico" type="image/x-icon">
+    <style>
+        body {
+            background: linear-gradient(135deg, #4b4b4b 0%, #949494 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .update-notice {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-bold text-white drop-shadow-lg mb-4">Melhores Promoções de Pacotes de Viagem</h1>
+            <p class="text-white text-lg">Descubra ofertas incríveis com as melhores datas e dias para viajar.
+                Atualização em tempo real a cada 30 segundos com dados de APIs de viagem simuladas!</p>
+        </header>
+
+        <div id="update-notice" class="update-notice">
+            Promoções atualizadas automaticamente! Última atualização: <span id="last-update"></span>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Filtros de Pesquisa</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Filtrar por Destino:</label>
+                    <input type="text" id="destino-filtro" placeholder="Ex: Cancún, Rio de Janeiro, Salvador..."
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Filtrar por Data de Início (a partir
+                        de):</label>
+                    <input type="date" id="data-filtro"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Ordenar por:</label>
+                    <select id="ordem-filtro"
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="preco">Preço (Menor Primeiro)</option>
+                        <option value="dias">Duração (Menor Primeiro)</option>
+                        <option value="alfabetico">Destino (A-Z)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-gray-800">Buscar por Estado Brasileiro no Decolar (Evita Erro de
+                GPS)</h2>
+            <p class="text-gray-600 mb-4">Selecione um estado para ir diretamente à busca de pacotes na Decolar (origem:
+                Brasília, datas aproximadas para outubro de 2025). Isso evita erros como "sinal de GPS perdido" ao
+                redirecionar para a capital do estado.</p>
+            <select id="estado-select"
+                class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+                <option value="">Selecione um estado...</option>
+                <option value="https://www.decolar.com/pacotes/bsb/rcb/pacotes-para-rio-branco-desde-brasilia">Acre (AC)
+                    - Rio Branco</option>
+                <option value="https://www.decolar.com/pacotes/bsb/mcz/pacotes-para-maceio-desde-brasilia">Alagoas (AL)
+                    - Maceió</option>
+                <option value="https://www.decolar.com/pacotes/bsb/mcp/pacotes-para-macapa-desde-brasilia">Amapá (AP) -
+                    Macapá</option>
+                <option value="https://www.decolar.com/pacotes/bsb/mao/pacotes-para-manaus-desde-brasilia">Amazonas (AM)
+                    - Manaus</option>
+                <option value="https://www.decolar.com/pacotes/bsb/ssa/pacotes-para-salvador-desde-brasilia">Bahia (BA)
+                    - Salvador</option>
+                <option value="https://www.decolar.com/pacotes/bsb/for/pacotes-para-fortaleza-desde-brasilia">Ceará (CE)
+                    - Fortaleza</option>
+                <option value="https://www.decolar.com/pacotes/bsb/bsb/pacotes-para-brasilia-desde-brasilia">Distrito
+                    Federal (DF) - Brasília</option>
+                <option value="https://www.decolar.com/pacotes/bsb/vix/pacotes-para-vitoria-desde-brasilia">Espírito
+                    Santo (ES) - Vitória</option>
+                <option value="https://www.decolar.com/pacotes/bsb/gyn/pacotes-para-goiania-desde-brasilia">Goiás (GO) -
+                    Goiânia</option>
+                <option value="https://www.decolar.com/pacotes/bsb/slz/pacotes-para-sao-luis-desde-brasilia">Maranhão
+                    (MA) - São Luís</option>
+                <option value="https://www.decolar.com/pacotes/bsb/cgb/pacotes-para-cuiaba-desde-brasilia">Mato Grosso
+                    (MT) - Cuiabá</option>
+                <option value="https://www.decolar.com/pacotes/bsb/cgr/pacotes-para-campo-grande-desde-brasilia">Mato
+                    Grosso do Sul (MS) - Campo Grande</option>
+                <option value="https://www.decolar.com/pacotes/bsb/cnf/pacotes-para-belo-horizonte-desde-brasilia">Minas
+                    Gerais (MG) - Belo Horizonte</option>
+                <option value="https://www.decolar.com/pacotes/bsb/bel/pacotes-para-belem-desde-brasilia">Pará (PA) -
+                    Belém</option>
+                <option value="https://www.decolar.com/pacotes/bsb/jpa/pacotes-para-joao-pessoa-desde-brasilia">Paraíba
+                    (PB) - João Pessoa</option>
+                <option value="https://www.decolar.com/pacotes/bsb/cwb/pacotes-para-curitiba-desde-brasilia">Paraná (PR)
+                    - Curitiba</option>
+                <option value="https://www.decolar.com/pacotes/bsb/rec/pacotes-para-recife-desde-brasilia">Pernambuco
+                    (PE) - Recife</option>
+                <option value="https://www.decolar.com/pacotes/bsb/the/pacotes-para-teresina-desde-brasilia">Piauí (PI)
+                    - Teresina</option>
+                <option value="https://www.decolar.com/pacotes/bsb/rio/pacotes-para-rio-de-janeiro-desde-brasilia">Rio
+                    de Janeiro (RJ) - Rio de Janeiro</option>
+                <option value="https://www.decolar.com/pacotes/bsb/nat/pacotes-para-natal-desde-brasilia">Rio Grande do
+                    Norte (RN) - Natal</option>
+                <option value="https://www.decolar.com/pacotes/bsb/poa/pacotes-para-porto-alegre-desde-brasilia">Rio
+                    Grande do Sul (RS) - Porto Alegre</option>
+                <option value="https://www.decolar.com/pacotes/bsb/pvh/pacotes-para-porto-velho-desde-brasilia">Rondônia
+                    (RO) - Porto Velho</option>
+                <option value="https://www.decolar.com/pacotes/bsb/bvb/pacotes-para-boa-vista-desde-brasilia">Roraima
+                    (RR) - Boa Vista</option>
+                <option value="https://www.decolar.com/pacotes/bsb/fln/pacotes-para-florianopolis-desde-brasilia">Santa
+                    Catarina (SC) - Florianópolis</option>
+                <option value="https://www.decolar.com/pacotes/bsb/sao/pacotes-para-sao-paulo-desde-brasilia">São Paulo
+                    (SP) - São Paulo</option>
+                <option value="https://www.decolar.com/pacotes/bsb/aju/pacotes-para-aracaju-desde-brasilia">Sergipe (SE)
+                    - Aracaju</option>
+                <option value="https://www.decolar.com/pacotes/bsb/pmw/pacotes-para-palmas-desde-brasilia">Tocantins
+                    (TO) - Palmas</option>
+            </select>
+            <button id="buscar-estado-btn"
+                class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition">Buscar no
+                Decolar</button>
+        </div>
+
+        <div id="loading" class="loading text-center my-8 hidden">
+            <p class="text-2xl text-white">Carregando promoções incríveis...</p>
+        </div>
+
+        <div id="no-results" class="text-center my-8 hidden">
+            <p class="text-xl text-white">Nenhum pacote encontrado para os filtros selecionados. Tente ajustar os
+                filtros!</p>
+        </div>
+
+        <div id="pacotes-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        </div>
+    </div>
+
+    <script>
+
+        let pacotes = [
+            {
+                id: 6,
+                destino: "Rio de Janeiro, RJ",
+                preco: 491,
+                dataInicio: "2025-09-30",
+                dataFim: "2025-10-05",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/c2dc2d0b-f4a3-451f-a734-8dafc1b42477/300x200",
+                descricao: "Pacote nacional com vistas incríveis e atrações imperdíveis.",
+                link: "https://www.decolar.com/pacotes/sjk/rio/pacotes-para-rio+de+janeiro-desde-sao+jose+dos+campos?package_id=0a413387dba9b3eb5b837e4d8337e3a18a3a05e14d1f1bfb5778ebb30515ab19&clickedPrice=BRL_625&priceDate=1757445330810&searchId=19d28bfa33fb42dcae9d2609905fc315&locale=pt-BR"
+            },
+            {
+                id: 14,
+                destino: "Maceió",
+                preco: 1592,
+                dataInicio: "2025-09-30",
+                dataFim: "2025-10-05",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/8516bd9a-4ea8-4e2d-9dc8-a95e625ac0f2/300x200",
+                descricao: "Paisagem lindamente perfeita com atração e passeios de lancha.",
+                link: "https://www.decolar.com/pacotes/sjk/rio/pacotes-para-rio+de+janeiro-desde-sao+jose+dos+campos?package_id=0a413387dba9b3eb5b837e4d8337e3a18a3a05e14d1f1bfb5778ebb30515ab19&clickedPrice=BRL_625&priceDate=1757445330810&searchId=19d28bfa33fb42dcae9d2609905fc315&locale=pt-BR"
+            },
+            {
+                id: 7,
+                destino: "Fortaleza, CE",
+                preco: 1408,
+                dataInicio: "2025-09-20",
+                dataFim: "2025-09-25",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/d5839fb1-49d3-43b8-b0da-69f59828d2df/300x200",
+                descricao: "Praias lindas e clima tropical com ótimo custo-benefício e mangue.",
+                link: "https://www.decolar.com/pacotes/sao/for/pacotes-para-fortaleza-desde-sao+paulo?package_id=83fc4d93e8c87052a324295d6d47374608c641b12c5fd095f0104cd9f5e4736b&clickedPrice=BRL_1629&priceDate=1757445603161&searchId=3d8a121f9d1a451d8abbcdc4551adef7&locale=pt-BR"
+            },
+            {
+                id: 9,
+                destino: "Salvador, BA",
+                preco: 1126,
+                dataInicio: "2025-09-28",
+                dataFim: "2025-10-03",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/0c68ff5e-ee32-4c77-8aae-49819a6a8bf7/300x200",
+                descricao: "Cultura rica, praias, gastronomia típica baiana e baciada vibrante.",
+                link: "https://www.decolar.com/pacotes/sao/ssa/pacotes-para-salvador-desde-sao+paulo?package_id=c34d318078bbe2e869b64d888e511c0f81222a39f6a76b3bc09c3b522a9b4c00&clickedPrice=BRL_1282&priceDate=1757445872486&searchId=8e6a3e5ecd104d10b0530607516a812b&locale=pt-BR"
+            },
+            {
+                id: 12,
+                destino: "Natal, RN",
+                preco: 1734,
+                dataInicio: "2025-09-22",
+                dataFim: "2025-09-27",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/af1d2da6-6299-45f9-a104-d915a800654a/300x200",
+                descricao: "Praias de águas mornas, dunas espetaculares e entretenimento.",
+                link: "https://www.decolar.com/pacotes/sao/nat/pacotes-para-natal-desde-sao+paulo?package_id=86e218c8c8f1642a112e639ccff8167be66eb374ec76aaec30583e1047e5ff6b&clickedPrice=BRL_2001&priceDate=1757445420177&searchId=9379d49e7ca748fbb971f261a5c9d1ce&locale=pt-BR"
+            },
+            {
+                id: 13,
+                destino: "Foz do Iguaçu, PR",
+                preco: 1116,
+                dataInicio: "2025-10-08",
+                dataFim: "2025-10-13",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/827405a7-e05b-4db8-87f3-619748b31540/300x200",
+                descricao: "Maravilhas naturais com cataratas imensas e aventuras ecológicas.",
+                link: "https://www.decolar.com/pacotes/sao/igu/pacotes-para-foz+do+iguacu-desde-sao+paulo?package_id=562bfdc0cc5f146aed1ed7f8f00ea6b654746c9d6a675154c2433c8e7a0dd6ed&clickedPrice=BRL_1325&priceDate=1757445569544&searchId=7c156c38d9f04678959363c8cc41cc2b&locale=pt-BR"
+            },
+            {
+                id: 16,
+                destino: "São Paulo, SP",
+                preco: 303,
+                dataInicio: "2025-10-15",
+                dataFim: "2025-10-20",
+                dias: 5,
+                imagem: "https://media.staticontent.com/media/pictures/f72dcdf1-9971-4948-b61e-30c971a083e5/300x200",
+                descricao: "Vida urbana vibrante com museus, teatros e diversidade cultural.",
+                link: "https://www.decolar.com/pacotes/rio/sao/pacotes-para-sao+paulo-desde-rio+de+janeiro?package_id=2004b3491575bd72c8ac3dc5b2fae9aaeebee8efad8ed6d580ce3bee8638ebe3&clickedPrice=BRL_484&priceDate=1757445490549&searchId=623d347eab0b4d2dbf49b3cdebce1b69&locale=pt-BR"
+            },
+        ];
+
+        const container = document.getElementById('pacotes-container');
+        const loading = document.getElementById('loading');
+        const noResults = document.getElementById('no-results');
+        const destinoFiltro = document.getElementById('destino-filtro');
+        const dataFiltro = document.getElementById('data-filtro');
+        const ordemFiltro = document.getElementById('ordem-filtro');
+        const estadoSelect = document.getElementById('estado-select');
+        const buscarEstadoBtn = document.getElementById('buscar-estado-btn');
+        const updateNotice = document.getElementById('update-notice');
+        const lastUpdate = document.getElementById('last-update');
+
+        async function buscarPacotesApi() {
+            return new Promise(resolve => setTimeout(() => resolve(pacotes), 1000));
+        }
+
+        function renderPacotes(pacotesFiltrados) {
+            container.innerHTML = '';
+            if (pacotesFiltrados.length === 0) {
+                noResults.classList.remove('hidden');
+                return;
+            }
+            noResults.classList.add('hidden');
+            pacotesFiltrados.forEach(pacote => {
+                const card = document.createElement('div');
+                card.className = 'card cursor-pointer';
+                card.innerHTML = `
+                    <img src="${pacote.imagem}" alt="Vista vibrante e detalhada de ${pacote.destino} com elementos naturais e culturais em cores ricas, incluindo principais atrações como ${pacote.descricao.split('.')[0]}" class="w-full h-48 object-cover" onerror="this.src='https://storage.googleapis.com/workspace-0f70711f-8b4e-4d94-86f1-2a93ccde5887/image/96a0e175-cd5a-4160-bebb-1fc9f5e3bde1.png'">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${pacote.destino}</h3>
+                        <p class="text-gray-600 mb-3">${pacote.descricao}</p>
+                        <div class="text-sm text-gray-500 mb-3">
+                            <p><strong>Data Início:</strong> ${pacote.dataInicio}</p>
+                            <p><strong>Data Fim:</strong> ${pacote.dataFim}</p>
+                            <p><strong>Duração:</strong> ${pacote.dias} dias</p>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-green-600">R$ ${pacote.preco.toLocaleString()}</span>
+                            <a href="${pacote.link}" target="_blank" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">Reservar Agora</a>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filtrarPacotes() {
+            let filtrados = [...pacotes];
+            const destino = destinoFiltro.value.toLowerCase();
+            const data = dataFiltro.value;
+            const ordem = ordemFiltro.value;
+
+            if (destino) {
+                filtrados = filtrados.filter(p => p.destino.toLowerCase().includes(destino));
+            }
+            if (data) {
+                filtrados = filtrados.filter(p => new Date(p.dataInicio) >= new Date(data));
+            }
+
+            if (ordem === 'preco') {
+                filtrados.sort((a, b) => a.preco - b.preco);
+            } else if (ordem === 'dias') {
+                filtrados.sort((a, b) => a.dias - b.dias);
+            } else if (ordem === 'alfabetico') {
+                filtrados.sort((a, b) => a.destino.localeCompare(b.destino));
+            }
+
+            renderPacotes(filtrados);
+        }
+
+        function atualizarPacotes() {
+            loading.classList.remove('hidden');
+            buscarPacotesApi().then(data => {
+                pacotes = data;
+                pacotes.forEach(p => {
+                    if (Math.random() < 0.3) {
+                        p.preco = Math.floor(p.preco * (0.9 + Math.random() * 0.2));
+                    }
+                });
+                lastUpdate.textContent = new Date().toLocaleTimeString();
+                updateNotice.style.display = 'block';
+                loading.classList.add('hidden');
+                filtrarPacotes();
+                setTimeout(() => updateNotice.style.display = 'none', 3000);
+            });
+        }
+
+        buscarEstadoBtn.addEventListener('click', () => {
+            const link = estadoSelect.value;
+            if (link) {
+                window.open(link, '_blank');
+            } else {
+                alert('Selecione um estado primeiro!');
+            }
+        });
+
+        atualizarPacotes();
+
+        destinoFiltro.addEventListener('input', filtrarPacotes);
+        dataFiltro.addEventListener('input', filtrarPacotes);
+        ordemFiltro.addEventListener('change', filtrarPacotes);
+
+        setInterval(atualizarPacotes, 30000);
+    </script>
+</body>
+
+</html>
+</content>
